@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% load static %}
+
+
+<link rel="stylesheet" href="{% static 'css/room.css' %}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.2/jquery.min.js" integrity="sha512-tWHlutFnuG0C6nQRlpvrEhE4QpkG1nn2MOUMWmUeRePl4e3Aki0VB6W1v3oLjFtd0hVOtRQ9PHpSfN6u6/QXkQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    $(document).ready(function(){
+    
+    setInterval(function(){
+        $.ajax({
+            type: 'GET',
+            url : "/getMessages/{{room_name}}/",
+            success: function(response){
+                console.log(response);
+                $("#display").empty();
+                for (var key in response.messages)
+                {
+                    var temp=`<div class='message'><h6>${response.messages[key].user}</h6><p>${response.messages[key].value}</p><p class='text-muted'>- ${response.messages[key].date}</p></div>`;
+                    $("#display").append(temp);
+                }
+            },
+            error: function(response){
+                // alert('An error occured')
+            }
+        });
+        },1000);
+    })
+</script>
+
+<div class="room my-3">
+    <div class="container">
+        <div class="alert alert-success" role="alert">
+            {{ room_name }} - chat-app
+        </div>
+        <div class="messages" id="display">
+            <!-- <div class="message">
+                <h6>Kevin Almer</h6>
+                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ea odio quo aliquam error reiciendis officiis atque dolor. Repudiandae ratione, quasi, inventore ad harum maiores voluptas reprehenderit nemo provident assumenda incidunt! </p>
+                <p class="text-muted">- 2022/12/19 8:15 am</p>
+            </div> -->
+        </div>
+        <form id="post-form">
+            {% csrf_token %}
+            <div class="mb-3">
+                
+                <input type="hidden" class="form-control" name="id_room" value="{{ room_data.id }}" id="room_id">
+                <input type="hidden" class="form-control" name="username" value="{{ username }}" id="username">
+                <label for="value_message" class="form-label">Message</label>
+                <input type="text" class="form-control" id="value_message" aria-describedby="value_message" name="value_message">
+            </div>
+            <button type="submit" name="submit" class="btn btn-secondary">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).on('submit','#post-form',function(e){
+      e.preventDefault();
+      $('#value_message').clearQueue()
+      $.ajax({
+        type:'POST',
+        url:'/send',
+        data:{
+            username:$('#username').val(),
+            id_room:$('#room_id').val(),
+            value_message:$('#value_message').val(),
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+        },
+        success: function(data){
+        //    alert(data)
+        }
+      });
+      document.getElementById('message').value = ''
+    });
+  </script>
+
+{% endblock %}

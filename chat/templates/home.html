@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<div class="form-chat-app my-5">
+    <div class="container">
+        <form action="{% url 'checkRoom' %}" method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="roomName" class="form-label">Room Name</label>
+                <input type="text" class="form-control" id="roomName" aria-describedby="roomName" name="room_name">
+            </div>
+            <div class="mb-3">
+                <label for="userName" class="form-label">User Name</label>
+                <input type="text" class="form-control" id="userName" aria-describedby="userName" name="username">
+            </div>
+            <button type="submit" class="btn btn-secondary">Submit</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
